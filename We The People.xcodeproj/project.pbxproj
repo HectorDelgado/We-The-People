@@ -13,6 +13,10 @@
 		22D90FBF246F36DF002E17D8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 22D90FBD246F36DF002E17D8 /* Main.storyboard */; };
 		22D90FC1246F36E0002E17D8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22D90FC0246F36E0002E17D8 /* Assets.xcassets */; };
 		22D90FC4246F36E0002E17D8 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 22D90FC2246F36E0002E17D8 /* LaunchScreen.storyboard */; };
+		22D90FCC246F38B3002E17D8 /* RecentPetitionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22D90FCB246F38B3002E17D8 /* RecentPetitionsViewController.swift */; };
+		22D90FCE246F391E002E17D8 /* PetitionsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22D90FCD246F391E002E17D8 /* PetitionsCell.swift */; };
+		22D90FD0246F3AC0002E17D8 /* Petition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22D90FCF246F3AC0002E17D8 /* Petition.swift */; };
+		9297F853089C1103BD8FF29D /* Pods_We_The_People.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3A0D05B53DA37359A21D1078 /* Pods_We_The_People.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +28,12 @@
 		22D90FC0246F36E0002E17D8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		22D90FC3246F36E0002E17D8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		22D90FC5246F36E0002E17D8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		22D90FCB246F38B3002E17D8 /* RecentPetitionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentPetitionsViewController.swift; sourceTree = "<group>"; };
+		22D90FCD246F391E002E17D8 /* PetitionsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetitionsCell.swift; sourceTree = "<group>"; };
+		22D90FCF246F3AC0002E17D8 /* Petition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Petition.swift; sourceTree = "<group>"; };
+		342AF480482CEC94FAD3B2C0 /* Pods-We The People.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-We The People.release.xcconfig"; path = "Target Support Files/Pods-We The People/Pods-We The People.release.xcconfig"; sourceTree = "<group>"; };
+		3A0D05B53DA37359A21D1078 /* Pods_We_The_People.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_We_The_People.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		674DC871A2F86786114FF597 /* Pods-We The People.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-We The People.debug.xcconfig"; path = "Target Support Files/Pods-We The People/Pods-We The People.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -31,6 +41,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9297F853089C1103BD8FF29D /* Pods_We_The_People.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -42,6 +53,8 @@
 			children = (
 				22D90FB6246F36DF002E17D8 /* We The People */,
 				22D90FB5246F36DF002E17D8 /* Products */,
+				8DBCE70F7626B2915D17C3B4 /* Pods */,
+				F580E564305A38B420D674B5 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -60,11 +73,32 @@
 				22D90FB9246F36DF002E17D8 /* SceneDelegate.swift */,
 				22D90FBB246F36DF002E17D8 /* ViewController.swift */,
 				22D90FBD246F36DF002E17D8 /* Main.storyboard */,
+				22D90FCB246F38B3002E17D8 /* RecentPetitionsViewController.swift */,
+				22D90FCF246F3AC0002E17D8 /* Petition.swift */,
+				22D90FCD246F391E002E17D8 /* PetitionsCell.swift */,
 				22D90FC0246F36E0002E17D8 /* Assets.xcassets */,
 				22D90FC2246F36E0002E17D8 /* LaunchScreen.storyboard */,
 				22D90FC5246F36E0002E17D8 /* Info.plist */,
 			);
 			path = "We The People";
+			sourceTree = "<group>";
+		};
+		8DBCE70F7626B2915D17C3B4 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				674DC871A2F86786114FF597 /* Pods-We The People.debug.xcconfig */,
+				342AF480482CEC94FAD3B2C0 /* Pods-We The People.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		F580E564305A38B420D674B5 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				3A0D05B53DA37359A21D1078 /* Pods_We_The_People.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -74,9 +108,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 22D90FC8246F36E0002E17D8 /* Build configuration list for PBXNativeTarget "We The People" */;
 			buildPhases = (
+				FA0193F27AFBFB19C3392CB7 /* [CP] Check Pods Manifest.lock */,
 				22D90FB0246F36DF002E17D8 /* Sources */,
 				22D90FB1246F36DF002E17D8 /* Frameworks */,
 				22D90FB2246F36DF002E17D8 /* Resources */,
+				CF93F97CBEB43C0FBC84FD91 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -133,14 +169,59 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		CF93F97CBEB43C0FBC84FD91 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-We The People/Pods-We The People-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-We The People/Pods-We The People-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-We The People/Pods-We The People-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		FA0193F27AFBFB19C3392CB7 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-We The People-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		22D90FB0246F36DF002E17D8 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				22D90FBC246F36DF002E17D8 /* ViewController.swift in Sources */,
+				22D90FCC246F38B3002E17D8 /* RecentPetitionsViewController.swift in Sources */,
 				22D90FB8246F36DF002E17D8 /* AppDelegate.swift in Sources */,
+				22D90FCE246F391E002E17D8 /* PetitionsCell.swift in Sources */,
 				22D90FBA246F36DF002E17D8 /* SceneDelegate.swift in Sources */,
+				22D90FD0246F3AC0002E17D8 /* Petition.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -282,6 +363,7 @@
 		};
 		22D90FC9246F36E0002E17D8 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 674DC871A2F86786114FF597 /* Pods-We The People.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -300,6 +382,7 @@
 		};
 		22D90FCA246F36E0002E17D8 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 342AF480482CEC94FAD3B2C0 /* Pods-We The People.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
