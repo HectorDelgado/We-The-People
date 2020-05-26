@@ -21,8 +21,8 @@ class PetitionsCell: UITableViewCell {
 //
 //        textLabel?.text = petition.petitionTitle
 //        detailTextLabel?.text = petition.petitionBody
-        cellTitle.text = petition.petitionTitle
-        cellSubtitle.text = petition.petitionBody
+        cellTitle.text = petition.title
+        cellSubtitle.text = petition.body
         cellSignatureCount.text = "\(petition.signatureCount)/\(petition.signaturesNeeded)"
     }
 
