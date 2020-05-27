@@ -9,7 +9,7 @@
 import UIKit
 import WebKit
 
-class WebViewController: UIViewController {
+class DetailViewController: UIViewController {
 
     @IBOutlet weak var petitionTitle: UILabel!
     @IBOutlet weak var petitionBody: UILabel!

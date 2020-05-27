@@ -7,14 +7,17 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
+        <!--Home View Controller-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="We_The_People" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="BYZ-38-t0r" customClass="HomeViewController" customModule="We_The_People" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.40000000000000002" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="liberty" translatesAutoresizingMaskIntoConstraints="NO" id="zOx-wG-AUr">
+                                <rect key="frame" x="0.0" y="88" width="414" height="808"/>
+                            </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="We The People" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hpN-rh-yiY">
                                 <rect key="frame" x="10" y="98" width="394" height="48"/>
                                 <fontDescription key="fontDescription" name="AvenirNext-Medium" family="Avenir Next" pointSize="35"/>
@@ -22,7 +25,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="24p-35-5rh">
-                                <rect key="frame" x="10" y="222" width="394" height="41"/>
+                                <rect key="frame" x="10" y="781" width="394" height="41"/>
                                 <fontDescription key="fontDescription" name="AvenirNext-Regular" family="Avenir Next" pointSize="21"/>
                                 <state key="normal" title="Find Most Recent Petitions"/>
                                 <connections>
@@ -32,11 +35,15 @@
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
+                            <constraint firstItem="zOx-wG-AUr" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="4bG-i2-eui"/>
                             <constraint firstItem="hpN-rh-yiY" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="10" id="6AF-JS-PpQ"/>
-                            <constraint firstItem="24p-35-5rh" firstAttribute="top" secondItem="hpN-rh-yiY" secondAttribute="bottom" constant="76" id="GEj-Oq-Y17"/>
+                            <constraint firstItem="zOx-wG-AUr" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="C1E-WE-gEO"/>
                             <constraint firstItem="24p-35-5rh" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="10" id="QVW-be-JBj"/>
+                            <constraint firstItem="zOx-wG-AUr" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="RKD-qc-Olx"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="24p-35-5rh" secondAttribute="trailing" constant="10" id="ZBa-7d-qnu"/>
                             <constraint firstItem="hpN-rh-yiY" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="10" id="dy6-7f-efF"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="24p-35-5rh" secondAttribute="bottom" constant="40" id="fmu-2c-yWF"/>
+                            <constraint firstAttribute="bottom" secondItem="zOx-wG-AUr" secondAttribute="bottom" id="g6W-tR-dEO"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="hpN-rh-yiY" secondAttribute="trailing" constant="10" id="oMS-t9-4Jm"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
@@ -104,6 +111,17 @@
                                                 <constraint firstItem="YK6-mn-SRo" firstAttribute="leading" secondItem="2uG-Ap-VWZ" secondAttribute="leadingMargin" id="vbn-bW-D5W"/>
                                             </constraints>
                                         </tableViewCellContentView>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="borderW">
+                                                <real key="value" value="2"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                                                <real key="value" value="0.0"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                                <real key="value" value="0.0"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
                                         <connections>
                                             <outlet property="cellSignatureCount" destination="Eg4-zS-isP" id="7lr-Zl-QM7"/>
                                             <outlet property="cellSubtitle" destination="eqX-i9-Nlf" id="pPu-o7-21x"/>
@@ -155,17 +173,19 @@
                     <navigationItem key="navigationItem" id="tUM-Up-GNB"/>
                     <connections>
                         <outlet property="activityIndicator" destination="ZIx-1r-Pii" id="aIk-QZ-DxM"/>
+                        <outlet property="nextBtn" destination="8wp-5W-1Nj" id="Bm6-Wp-nuE"/>
                         <outlet property="petitionsTableView" destination="8Xc-Sx-3fL" id="ljm-dD-vb2"/>
+                        <outlet property="previousBtn" destination="0pB-q2-19h" id="pHM-aR-Q4m"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Ja9-ML-GQ6" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1973.913043478261" y="-4.0178571428571423"/>
         </scene>
-        <!--Web View Controller-->
+        <!--Detail View Controller-->
         <scene sceneID="G7Y-lZ-MQ2">
             <objects>
-                <viewController id="mg1-W9-Z1R" customClass="WebViewController" customModule="We_The_People" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="mg1-W9-Z1R" customClass="DetailViewController" customModule="We_The_People" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="HRv-29-2sh">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -268,4 +288,7 @@
             <point key="canvasLocation" x="137.68115942028987" y="137.94642857142856"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="liberty" width="506" height="634.5"/>
+    </resources>
 </document>

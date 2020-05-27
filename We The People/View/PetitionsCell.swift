@@ -8,11 +8,30 @@
 
 import UIKit
 
+@IBDesignable
 class PetitionsCell: UITableViewCell {
     
     @IBOutlet weak var cellTitle: UILabel!
     @IBOutlet weak var cellSubtitle: UILabel!
     @IBOutlet weak var cellSignatureCount: UILabel!
+    
+    @IBInspectable var borderWidth: CGFloat = 0.0 {
+        didSet {
+            self.layer.borderWidth = borderWidth
+        }
+    }
+    
+    @IBInspectable var cornerRadius: CGFloat = 0.0 {
+        didSet {
+            self.layer.cornerRadius = cornerRadius
+        }
+    }
+    
+    @IBInspectable var cellColor: UIColor = UIColor.white {
+        didSet {
+            self.backgroundColor = cellColor
+        }
+    }
     
     
     func updateView(petition: Petition) {
@@ -28,7 +47,9 @@ class PetitionsCell: UITableViewCell {
 
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
+        
+        
+        //self.layer.borderWidth  = CGFloat(4.0)
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -36,5 +57,7 @@ class PetitionsCell: UITableViewCell {
 
         // Configure the view for the selected state
     }
+    
+    
 
 }

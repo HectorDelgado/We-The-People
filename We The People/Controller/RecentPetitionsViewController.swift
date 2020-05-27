@@ -13,16 +13,23 @@ class RecentPetitionsViewController: UIViewController {
 
     @IBOutlet weak var petitionsTableView: UITableView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet weak var previousBtn: UIButton!
+    @IBOutlet weak var nextBtn: UIButton!
     
-    private var baseURL = "https://api.whitehouse.gov/v1/petitions.json?"
+    private let baseURL = "https://api.whitehouse.gov/v1/petitions.json?"
+    private let reachability = Reachability.shared
     
-    var unfilteredPetitions = [Petition]()
-    var filteredPetitions = [Petition]()
-    var currentPetitions = [Petition]()
+    private var unfilteredPetitions = [Petition]()
+    private var filteredPetitions = [Petition]()
+    private var currentPetitions = [Petition]()
+    private var limit = 25
+    private var offset = 0
     
-    
-    var limit = 25
-    var offset = 0
+    enum ValidationError: Error {
+        case invalidData(String)
+        case invalidURL(String)
+        case invalidJSON(String)
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,40 +37,66 @@ class RecentPetitionsViewController: UIViewController {
         petitionsTableView.dataSource = self
         petitionsTableView.delegate = self
         
-        title = "Petitions \(offset + 1)-\(limit)"
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .organize, target: self, action: #selector(displayOptions))
         
-        //baseURL.append("limit=\(limit)&offset=\(offset)")
-        let url = "\(baseURL)limit=\(limit)&offset=\(offset)"
-        getJSON(for: url)
+        if reachability.connectionIsAvailable {
+            loadJSON()
+        } else {
+            present(reachability.errorAlert(), animated: true)
+        }
     }
     
-    /// Retrieves the JSON data from the specified URL.
-    /// - Parameter jsonData: Block of code that exectues when the data has been successfully retrieved.
-    /// - Returns: The JSON data that was found.
-    private func getJSON(for urlString: String) {
-        // Get URL results using GCD background thread
+    /// Loads the JSON results of the current url asyncronously.
+    /// Uses the Result value of the getResults method to either display an error message or begin to parse the JSON data.
+    private func loadJSON() {
+        pauseUI()
+        
         DispatchQueue.global(qos: .userInitiated).async {
-            if let url = URL(string: urlString) {
-                if let data = try? Data(contentsOf: url) {
-                    if let json = try? JSON(data: data) {
-                        // Once results are found, switch back to main thread.
-                        DispatchQueue.main.async {
-                            self.parseJSON(for: json)
-                        }
-                    } else {
-                        self.displayError(alertTitle: "Oops", alertMessage: "There was an error getting the data\n(BAD JSON DATA)", actionTitle: "OK", handler: nil)
-                    }
-                } else {
-                    self.displayError(alertTitle: "Oops", alertMessage: "There was an error getting the data\n(BAD DATA)", actionTitle: "OK", handler: nil)
+            let result = self.getResults(for: "\(self.baseURL)limit=\(self.limit)&offset=\(self.offset)")
+            
+            DispatchQueue.main.async {
+                switch result {
+                case let .success(jsonData):
+                    self.parseJSON(for: jsonData)
+                case let .failure(error):
+                    self.updateUI(with: [Petition]())
+                    self.displayError(alertTitle: "Oops", alertMessage: "There was an error. \(error.localizedDescription)", actionTitle: "OK", handler: nil)
+                    print(error)
                 }
-            } else {
-                self.displayError(alertTitle: "Oops", alertMessage: "There was an error getting the data\n(INVALID URL)", actionTitle: "OK", handler: nil)
             }
         }
     }
     
-    /// Parses through the  JSON object to initialize the array of unfiltered Petition objects
+    /// Uses Result and Grand Central Dispatch (GCD) to effeciently retrieve the JSON data from the given url.
+    /// A DispatchSemaphore is used to wait until a signal is received meaning either success or failure has occurred..
+    /// - Parameter urlString: The url to retrieve data from.
+    /// - Returns: A Result value containing either a success or failure, and the associated value in each case.
+    private func getResults(for urlString: String) -> Result<JSON, ValidationError> {
+        var result: Result<JSON, ValidationError>!
+        
+        let semaphore = DispatchSemaphore(value: 0)
+        
+        guard let url = URL(string: urlString) else {
+            result = .failure(ValidationError.invalidURL("Bad URL"))
+            return result
+        }
+        guard let data = try? Data(contentsOf: url) else {
+            result = .failure(ValidationError.invalidData("Bad Data"))
+            return result
+        }
+        guard let json = try? JSON(data: data) else {
+            result = .failure(ValidationError.invalidJSON("Bad JSON"))
+            return result
+        }
+        
+        result = .success(json)
+        semaphore.signal()
+        
+        _ = semaphore.wait(wallTimeout: .distantFuture)
+        return result
+    }
+    
+    /// Parses through the JSON object to create an array of Petition objects
     /// - Parameter jsonData: The JSON object to be parsed.
     private func parseJSON(for jsonData: JSON) {
         if jsonData.count > 0 {
@@ -76,43 +109,58 @@ class RecentPetitionsViewController: UIViewController {
                     let body = jsonResults[i]["body"].string,
                     let signatureCount = jsonResults[i]["signatureCount"].int,
                     let signaturesNeeded = jsonResults[i]["signaturesNeeded"].int {
-                    
-                    tempArray.append(Petition(petitionID: petitionID, title: title, body: body, signatureCount: signatureCount, signaturesNeeded: signaturesNeeded))
-                    //unfilteredPetitions.removeAll()
-                    //unfilteredPetitions.append(Petition(petitionID: petitionID, title: title, body: body, signatureCount: signatureCount, signaturesNeeded: signaturesNeeded))
+                    tempArray.append(
+                        Petition(petitionID: petitionID,
+                                 title: title,
+                                 body: body,
+                                 signatureCount: signatureCount,
+                                 signaturesNeeded: signaturesNeeded))
                 }
             }
             
             unfilteredPetitions.removeAll()
             unfilteredPetitions.append(contentsOf: tempArray)
             updateUI(with: unfilteredPetitions)
+        } else {
+            updateUI(with: [Petition]())
         }
     }
     
+    /// Stops user interaction by disabling the previous/next buttons and displaying an activity indicator.
     private func pauseUI() {
+        previousBtn.isEnabled = false
+        nextBtn.isEnabled = false
         activityIndicator.isHidden = false
         activityIndicator.startAnimating()
-        
-        // Pause buttons
     }
     
     /// Updates the UI to display the array of Petition objects.
     /// - Parameter petitions: The array to display.
     private func updateUI(with petitions: [Petition]) {
+        title = "Petitions \(offset + 1)-\(offset + limit)"
         currentPetitions.removeAll()
         currentPetitions.append(contentsOf: petitions)
+        previousBtn.isEnabled = true
+        nextBtn.isEnabled = true
         activityIndicator.isHidden = true
         activityIndicator.stopAnimating()
         petitionsTableView.reloadData()
     }
     
+    
+    /// Convenience method that displays a simple UIAlertController.
+    /// - Parameters:
+    ///   - alertTitle: Title for alert.
+    ///   - alertMessage: Message for alert.
+    ///   - actionTitle: Title for action.
+    ///   - handler: Optional handler.
     private func displayError(alertTitle: String?, alertMessage: String?, actionTitle: String?, handler: ((UIAlertAction) -> Void)?) {
         let alertController = UIAlertController(title: alertTitle, message: alertMessage, preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: actionTitle, style: .default, handler: handler))
         self.present(alertController, animated: true)
     }
     
-    private func filter(petitions: [Petition], by keyword: String) {
+    private func filter(by keyword: String, in petitions: [Petition], results: ([Petition]) -> ()) {
         let lowerKeyword = keyword.lowercased()
         var tempArray = [Petition]()
         
@@ -121,7 +169,8 @@ class RecentPetitionsViewController: UIViewController {
                 tempArray.append(petition)
             }
         }
-        updateUI(with: tempArray)
+        
+        results(tempArray)
     }
     
     @objc private func displayOptions() {
@@ -143,7 +192,16 @@ class RecentPetitionsViewController: UIViewController {
         }
         alertController.addAction(UIAlertAction(title: "Ok", style: .default, handler: { (action) in
             if let title = alertController.textFields?.first?.text, title.count > 0 {
-                self.filter(petitions: self.currentPetitions, by: title)
+                self.filter(by: title, in: self.currentPetitions) { results in
+                    if results.count != 0 {
+                        self.updateUI(with: results)
+                    } else {
+                        self.displayError(alertTitle: "Oops", alertMessage: "No article found with keyword \"\(title)\"", actionTitle: "OK", handler: nil)
+                    }
+                    
+                }
+            } else {
+                self.displayError(alertTitle: "Oops", alertMessage: "You need to enter a keyword to search for!", actionTitle: "OK", handler: nil)
             }
         }))
         present(alertController, animated: true)
@@ -152,25 +210,28 @@ class RecentPetitionsViewController: UIViewController {
     @IBAction func previousBtnTapped(_ sender: UIButton) {
         if offset >= 25 {
             offset -= 25
-            title = "Petitions \(offset + 1)-\(offset + limit)"
             
-            let url = "\(baseURL)limit=\(limit)&offset=\(offset)"
-            getJSON(for: url)
+            if reachability.connectionIsAvailable {
+                loadJSON()
+            } else {
+                present(reachability.errorAlert(), animated: true)
+            }
         }
     }
     
     @IBAction func nextBtnTapped(_ sender: UIButton) {
         offset += 25
-        title = "Petitions \(offset + 1)-\(offset + limit)"
         
-        let url = "\(baseURL)limit=\(limit)&offset=\(offset)"
-        pauseUI()
-        getJSON(for: url)
+        if reachability.connectionIsAvailable {
+            loadJSON()
+        } else {
+            present(reachability.errorAlert(), animated: true)
+        }
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let backItem = UIBarButtonItem()
-        backItem.title = "SOMEEE"
+        backItem.title = "Back"
         navigationItem.backBarButtonItem = backItem
         
     }
@@ -204,3 +265,7 @@ extension RecentPetitionsViewController: UITableViewDelegate, UITableViewDataSou
         
     }
 }
+
+//extension ValidationError: LocalizedError {
+//
+//}
