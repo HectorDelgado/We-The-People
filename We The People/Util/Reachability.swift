@@ -32,9 +32,9 @@ public class Reachability {
         monitor.start(queue: queue)
     }
     
-    func errorAlert() -> UIAlertController {
-        let alert = UIAlertController(title: "Oops!", message: "Network connection not detected!\nTry again later.", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-        return alert
-    }
+//    func errorAlert() -> UIAlertController {
+//        let alert = UIAlertController(title: "Oops!", message: "Network connection not detected!\nTry again later.", preferredStyle: .alert)
+//        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+//        return alert
+//    }
 }

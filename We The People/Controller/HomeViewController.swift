@@ -20,11 +20,12 @@ class HomeViewController: UIViewController {
         let connectionAvailable = reachability.connectionIsAvailable
         
         if !connectionAvailable {
-            present(reachability.errorAlert(), animated: true)
+            let alert = UIAlertController(title: "Oops", message: "No Internet connection detected!", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+            present(alert, animated: true)
         }
         
         return connectionAvailable
-    }
-    
+    }   
 }
 

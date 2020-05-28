@@ -11,25 +11,24 @@ import SwiftyJSON
 
 class RecentPetitionsViewController: UIViewController {
 
+    ///
+    /// IBOutlets
+    ///
     @IBOutlet weak var petitionsTableView: UITableView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var previousBtn: UIButton!
     @IBOutlet weak var nextBtn: UIButton!
     
+    ///
+    /// Properties
+    ///
     private let baseURL = "https://api.whitehouse.gov/v1/petitions.json?"
     private let reachability = Reachability.shared
-    
     private var unfilteredPetitions = [Petition]()
     private var filteredPetitions = [Petition]()
     private var currentPetitions = [Petition]()
     private var limit = 25
     private var offset = 0
-    
-    enum ValidationError: Error {
-        case invalidData(String)
-        case invalidURL(String)
-        case invalidJSON(String)
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,7 +41,7 @@ class RecentPetitionsViewController: UIViewController {
         if reachability.connectionIsAvailable {
             loadJSON()
         } else {
-            present(reachability.errorAlert(), animated: true)
+            displayError(alertTitle: "Oops", alertMessage: "Network connection not detected!\nTry again later.", actionTitle: "Ok", handler: nil)
         }
     }
     
@@ -60,7 +59,7 @@ class RecentPetitionsViewController: UIViewController {
                     self.parseJSON(for: jsonData)
                 case let .failure(error):
                     self.updateUI(with: [Petition]())
-                    self.displayError(alertTitle: "Oops", alertMessage: "There was an error. \(error.localizedDescription)", actionTitle: "OK", handler: nil)
+                    self.displayError(alertTitle: "Oops", alertMessage: error.shortDescription, actionTitle: "OK", handler: nil)
                     print(error)
                 }
             }
@@ -77,15 +76,15 @@ class RecentPetitionsViewController: UIViewController {
         let semaphore = DispatchSemaphore(value: 0)
         
         guard let url = URL(string: urlString) else {
-            result = .failure(ValidationError.invalidURL("Bad URL"))
+            result = .failure(ValidationError(errorType: .invalidURL(urlString)))
             return result
         }
         guard let data = try? Data(contentsOf: url) else {
-            result = .failure(ValidationError.invalidData("Bad Data"))
+            result = .failure(ValidationError(errorType: .badData))
             return result
         }
         guard let json = try? JSON(data: data) else {
-            result = .failure(ValidationError.invalidJSON("Bad JSON"))
+            result = .failure(ValidationError(errorType: .badJSON))
             return result
         }
         
@@ -117,9 +116,6 @@ class RecentPetitionsViewController: UIViewController {
                                  signaturesNeeded: signaturesNeeded))
                 }
             }
-            
-            unfilteredPetitions.removeAll()
-            unfilteredPetitions.append(contentsOf: tempArray)
             updateUI(with: unfilteredPetitions)
         } else {
             updateUI(with: [Petition]())
@@ -147,7 +143,6 @@ class RecentPetitionsViewController: UIViewController {
         petitionsTableView.reloadData()
     }
     
-    
     /// Convenience method that displays a simple UIAlertController.
     /// - Parameters:
     ///   - alertTitle: Title for alert.
@@ -160,7 +155,13 @@ class RecentPetitionsViewController: UIViewController {
         self.present(alertController, animated: true)
     }
     
-    private func filter(by keyword: String, in petitions: [Petition], results: ([Petition]) -> ()) {
+    /// Filters through an array of Petitions searching for objects that contain the keyword as a title.
+    /// The results are then returned as a Result value.
+    /// - Parameters:
+    ///   - keyword: The title the user is looking for.
+    ///   - petitions: The array of Petition objects to search through.
+    /// - Returns: A Result value indicating a success or failure.
+    private func filter(by keyword: String, in petitions: [Petition]) -> Result<[Petition], ValidationError> {
         let lowerKeyword = keyword.lowercased()
         var tempArray = [Petition]()
         
@@ -170,9 +171,16 @@ class RecentPetitionsViewController: UIViewController {
             }
         }
         
-        results(tempArray)
+        if tempArray.count == 0 {
+            return .failure(ValidationError(errorType: .noItemsFound))
+        } else {
+            return .success(tempArray)
+        }
     }
     
+    
+    /// Displays a sheet of possible actions when the RightBarButtonItem is clicked.
+    /// Possible actions include "Search", "Reset",  and "Cancel"
     @objc private func displayOptions() {
         let alertController = UIAlertController(title: nil, message: "Choose an option", preferredStyle: .actionSheet)
         alertController.addAction(UIAlertAction(title: "Search", style: .default, handler: { _ in
@@ -185,6 +193,7 @@ class RecentPetitionsViewController: UIViewController {
         self.present(alertController, animated: true)
     }
     
+    /// Displays a UIAlertController that allows users to search for Petitions by a keyword.
     private func displaySearchAlert() {
         let alertController = UIAlertController(title: "Search for", message: nil, preferredStyle: .alert)
         alertController.addTextField { (uiTextField) in
@@ -192,13 +201,13 @@ class RecentPetitionsViewController: UIViewController {
         }
         alertController.addAction(UIAlertAction(title: "Ok", style: .default, handler: { (action) in
             if let title = alertController.textFields?.first?.text, title.count > 0 {
-                self.filter(by: title, in: self.currentPetitions) { results in
-                    if results.count != 0 {
-                        self.updateUI(with: results)
-                    } else {
-                        self.displayError(alertTitle: "Oops", alertMessage: "No article found with keyword \"\(title)\"", actionTitle: "OK", handler: nil)
-                    }
-                    
+                let results = self.filter(by: title, in: self.currentPetitions)
+                
+                switch results {
+                case let .success(filtered):
+                    self.updateUI(with: filtered)
+                case let .failure(error):
+                    self.displayError(alertTitle: "Oops", alertMessage: error.shortDescription, actionTitle: "OK", handler: nil)
                 }
             } else {
                 self.displayError(alertTitle: "Oops", alertMessage: "You need to enter a keyword to search for!", actionTitle: "OK", handler: nil)
@@ -207,6 +216,7 @@ class RecentPetitionsViewController: UIViewController {
         present(alertController, animated: true)
     }
     
+    /// Loads the previous 25 Petitions
     @IBAction func previousBtnTapped(_ sender: UIButton) {
         if offset >= 25 {
             offset -= 25
@@ -214,39 +224,32 @@ class RecentPetitionsViewController: UIViewController {
             if reachability.connectionIsAvailable {
                 loadJSON()
             } else {
-                present(reachability.errorAlert(), animated: true)
+                displayError(alertTitle: "Oops", alertMessage: "Network connection not detected!\nTry again later.", actionTitle: "Ok", handler: nil)
             }
         }
     }
     
+    /// Loads the next 25 Petitions
     @IBAction func nextBtnTapped(_ sender: UIButton) {
         offset += 25
         
         if reachability.connectionIsAvailable {
             loadJSON()
         } else {
-            present(reachability.errorAlert(), animated: true)
+            displayError(alertTitle: "Oops", alertMessage: "Network connection not detected!\nTry again later.", actionTitle: "Ok", handler: nil)
         }
     }
     
+    /// Sets up the UIBackButtonItem for the next ViewController
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let backItem = UIBarButtonItem()
         backItem.title = "Back"
         navigationItem.backBarButtonItem = backItem
         
     }
-    
-//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-//        // Get the new view controller using segue.destination.
-//        // Pass the selected object to the new view controller.
-//        if segue.identifier == "webViewSegue" {
-//            if let vc = segue.destination as? WebViewController {
-//                vc.petition =
-//            }
-//        }
-//    }
 }
 
+/// UITableView delegate and data source methods
 extension RecentPetitionsViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return currentPetitions.count
@@ -266,6 +269,3 @@ extension RecentPetitionsViewController: UITableViewDelegate, UITableViewDataSou
     }
 }
 
-//extension ValidationError: LocalizedError {
-//
-//}
